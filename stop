@@ -1,0 +1,9 @@
+#!/bin/bash
+#killall mencoder
+#killall vlc
+pkill -f 'registra'
+#pkill -f 'mplayer.*-dumpstream'
+pkill -f 'cat.*dev.dvb.adapter.*'
+pkill -f 'python.*mytzap.py*'
+killall dvbstream
+killall tzap

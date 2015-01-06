@@ -1,0 +1,16 @@
+#!/bin/bash
+DIR=$HOME/video
+OUT=$HOME/video/logs
+mkdir -p "$OUT"
+find -L "$DIR/" -regextype posix-egrep -iregex '(.*\.avi|.*\.mkv)' | while read f;
+do
+echo "***$f***"
+BASENAME="`basename \"$f\"`"
+OUTFILE="$OUT/$BASENAME.txt"
+if [ ! -f "$OUTFILE" -o "$f" -nt "$OUTFILE" ]; then
+DIRNAME="`dirname \"$f\"`"
+echo Analyzing \"$f\"...
+mplayer -quiet "$f" -vo null -nosound -benchmark </dev/null &> "$OUTFILE"
+echo -n Broken frames for "$f":\  ; grep frame "$OUTFILE"| wc -l
+fi
+done

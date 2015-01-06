@@ -1,0 +1,18 @@
+#!/bin/bash
+DEF_CHANNEL="Rai 4"
+OUTDIR="$HOME/video/tv"
+mkdir -p "$OUTDIR"
+CHANNEL=${1:-$DEF_CHANNEL}
+
+while [ x ];
+do 
+mytzap.py -a 0 -r "${CHANNEL}" 2>&1 | uniq &
+OUTFILE="${OUTDIR}/`date +%Y%m%d_%H%M`_${CHANNEL}.ts"
+#mytzap.py -a 0 -r "${CHANNEL}" -o "${OUTFILE}" 2>&1 | uniq
+if [ "${CHANNEL}" = "Rai HD" ]
+then
+    dvbstream -o 525 535 645 > "${OUTFILE}"
+else
+    cat /dev/dvb/adapter0/dvr0 > "${OUTFILE}"
+fi
+done

@@ -1,0 +1,3 @@
+#!/bin/sh
+AVIDEMUX_DIR=/opt/avidemux
+LD_LIBRARY_PATH=${AVIDEMUX_DIR}/lib:$LD_LIBRARY_PATH PATH=${AVIDEMUX_DIR}/bin:$PATH avidemux3_qt4
