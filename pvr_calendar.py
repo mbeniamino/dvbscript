@@ -60,7 +60,6 @@ def get_events(calendar_name, ts):
     service = discovery.build('calendar', 'v3', http=http)
 
     isots = ts.isoformat()
-    print "isots", isots
     cal_list = service.calendarList().list().execute().get('items')
     for cal in cal_list:
         if cal["summary"] == calendar_name:
@@ -77,7 +76,6 @@ def get_events(calendar_name, ts):
     for event in events:
         start = dateutil.parser.parse(event['start'].get('dateTime', event['start'].get('date')))
         end = dateutil.parser.parse(event['end'].get('dateTime', event['end'].get('date')))
-        print "start, end", start, end
         if start >= ts:
             res.append((event['summary'], start, end))
     return res
@@ -87,7 +85,7 @@ class App:
         self.q = []
         self.pi = "pi" in sys.argv
         self.sleep_time = 1
-        self.update_events_time = 10 # 600 TODO
+        self.update_events_time = 600
         self.last_update = datetime.datetime(1900, 1, 1)
         self.offset = 0
 
@@ -96,7 +94,6 @@ class App:
 
     def execute(self, event):
         ts, cmd, parms = event
-        print ts, cmd, parms
         sys = None
         if cmd == "rec":
             sys = 'registra "%s"' % parms
@@ -109,25 +106,19 @@ class App:
 
     def main(self):
         next_update = self.now() - datetime.timedelta(seconds = 1)
-        print "next_update", next_update
         while True:
             now = self.now()
             for e in self.q:
-                print "now", now
                 events = [e for e in self.q if e[0] <= now]
                 for e in events:
                     self.execute(e)
                 if events:
                     self.q = [e for e in self.q if e[0] > now]
-            print now, next_update
-            print self.q
             if now > next_update:
                 events = get_events("TV", next_update)
                 next_update = next_update + datetime.timedelta(seconds=self.update_events_time)
                 for parms, start, end in events:
-                    print "start, next_update", start, next_update
                     if start < next_update:
-                        print "start < next_update!"
                         if self.pi:
                             self.q.append((start, "wakeup"))
                         else:
